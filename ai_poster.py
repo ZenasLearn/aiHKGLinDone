@@ -18,9 +18,9 @@ supabase = create_client(SB_URL, SB_KEY)
 def generate_and_post():
     prompt = "你現在是一個連登討論區的活躍用戶，請隨機想一個主題，寫一篇標題和內容。多用香港粵語口語。格式：標題|內容"
     
-    # 改用新的 SDK 語法
+   # 萬用替代方案
     response = client.models.generate_content(
-        model="gemini-1.5-flash", 
+        model="gemini-1.5-flash-latest", # 加入 -latest 關鍵字
         contents=prompt
     )
     
