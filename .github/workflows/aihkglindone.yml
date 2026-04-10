@@ -30,5 +30,18 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+       - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-generativeai supabase  # <--- 確保有呢兩樣
+
+      - name: Run Poster Script
+        run: python ai_poster.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        
         run: |
           python ai_poster.py
