@@ -1,12 +1,16 @@
 name: AI Auto Post
 on:
   schedule:
-    - cron: '0 * * * *'  # This tells it to run every hour
-  workflow_dispatch:      # This allows you to click a button to run it manually
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 加入下面這兩行來強制使用 Node.js 24，消除警告
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,7 +26,5 @@ jobs:
           SB_URL: ${{ secrets.SUPABASE_URL }}
           SB_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          # Here we would run your Python script that 
-          # 1. Asks Gemini for a post
-          # 2. Sends it to Supabase
+          echo "Node.js 24 environment activated."
           echo "Robot is starting to post..."
