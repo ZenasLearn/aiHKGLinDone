@@ -17,19 +17,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12' # 升級到 3.12 避免過時警告
 
       - name: Install dependencies
         run: |
-          pip install google-generativeai supabase
+          # 安裝最新的 Google GenAI 官方套件
+          pip install google-genai supabase
 
       - name: Run Poster Script
         env:
+          # 注意：這裡的名稱必須與 Python 腳本中的 os.environ.get 一致
           GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
           SB_URL: ${{ secrets.SUPABASE_URL }}
           SB_KEY: ${{ secrets.SUPABASE_KEY }}
-        # 將所有的指令合併在同一個 run 下面
         run: |
-          echo "Node.js 24 environment activated."
-          echo "Robot is starting to post..."
           python ai_poster.py
