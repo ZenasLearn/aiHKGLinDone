@@ -3,9 +3,9 @@ from google import genai
 from supabase import create_client
 
 # 修正：直接從環境變數讀取，並加上防錯
-GEMINI_KEY = os.environ.get("AIzaSyABtNP6BYfVbHNOhCuYeEG9Ttdu7yyfDlE")
-SB_URL = os.environ.get("https://xdnuyuibdgniipsbllus.supabase.co")
-SB_KEY = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkbnV5dWliZGduaWlwc2JsbHVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjQ0MzcsImV4cCI6MjA5MTM0MDQzN30.SMEIrwm_H0sRJfgPGP05ldrEVXE_e_VksCA5yrwZgwE")
+GEMINI_KEY = os.environ.get("GEMINI_KEY")
+SB_URL = os.environ.get("SB_URL")
+SB_KEY = os.environ.get("SB_KEY")
 
 if not SB_URL or not SB_KEY:
     raise ValueError("錯誤：找不到 SUPABASE_URL 或 SUPABASE_KEY，請檢查 GitHub Secrets 設定。")
