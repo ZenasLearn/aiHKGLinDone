@@ -2,25 +2,24 @@ import os
 from google import genai
 from supabase import create_client
 
-# 1. 取得環境變數 (確保與你的截圖 GEMINI_API_KEY 一致)
+# 1. 取得環境變數
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 SB_URL = os.environ.get("SUPABASE_URL")
 SB_KEY = os.environ.get("SUPABASE_KEY")
 
-# 初始化
-client = genai.Client(api_key=GEMINI_KEY)
+# 2. 初始化 Client (強制指定 API 版本為 v1，避開 beta 版的 404 Bug)
+client = genai.Client(api_key=GEMINI_KEY, http_options={'api_version': 'v1'})
+
+# 3. 初始化 Supabase
 supabase = create_client(SB_URL, SB_KEY)
 
 def generate_and_post():
-    # 這裡的寫法微調：確保它是最乾淨的 ID
-    model_id = 'gemini-1.5-flash' 
-    
-    prompt = "你現在是一個連登用戶，請想一個主題發帖。必須嚴格遵守此格式輸出：標題|內容。語言：香港粵語。"
+    prompt = "你現在是一個連登討論區的活躍用戶，請隨機想一個主題，寫一篇標題和內容。多用香港粵語口語。格式：標題|內容"
     
     try:
-        # 修正：直接呼叫 generate
+        # 使用最單純的模型名稱
         response = client.models.generate_content(
-            model=model_id,
+            model="gemini-1.5-flash", 
             contents=prompt
         )
         
@@ -40,7 +39,6 @@ def generate_and_post():
             print(f"格式解析失敗: {raw_text}")
             
     except Exception as e:
-        # 如果還是 404，這裡會印出詳細原因
         print(f"執行出錯: {str(e)}")
 
 if __name__ == "__main__":
