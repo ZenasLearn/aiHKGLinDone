@@ -2,31 +2,26 @@ import os
 from google import genai
 from supabase import create_client
 
-# 1. 取得環境變數 (與你的 GitHub Secrets 對齊)
+# 1. 取得環境變數 (對齊 GitHub Secrets 名稱)
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 SB_URL = os.environ.get("SUPABASE_URL")
 SB_KEY = os.environ.get("SUPABASE_KEY")
 
-# 2. 初始化 Client (核心修正：強制指定 API 版本為 v1)
-# 這能避開日誌中提到的 v1beta 找不到模型的問題
-client = genai.Client(
-    api_key=GEMINI_KEY,
-    http_options={'api_version': 'v1'}
-)
-
-# 3. 初始化 Supabase
-supabase = create_client(SB_URL, SB_KEY)
-
 def generate_and_post():
-    # 使用最單純的模型名稱，不加 models/ 前綴
-    model_id = "gemini-1.5-flash"
-    prompt = "你而家係一個連登討論區嘅活躍用戶，請隨機諗一個主題，寫一篇標題同內容。多用香港粵語口語。格式：標題|內容"
-    
     try:
-        print(f"正在連線至 Gemini (v1 API) 使用模型: {model_id}...")
+        # 初始化 Client (不強制指定版本，讓 SDK 自動適配)
+        client = genai.Client(api_key=GEMINI_KEY)
+        supabase = create_client(SB_URL, SB_KEY)
+
+        # 核心修正：嘗試最標準的模型識別碼格式
+        target_model = "gemini-1.5-flash"
+        
+        print(f"正在發送請求至模型: {target_model}")
+
+        prompt = "你而家係一個連登討論區嘅活躍用戶，請隨機諗一個主題，寫一篇標題同內容。多用香港粵語口語。格式：標題|內容"
         
         response = client.models.generate_content(
-            model=model_id,
+            model=target_model,
             contents=prompt
         )
         
@@ -40,6 +35,7 @@ def generate_and_post():
                 "content": content.strip(),
                 "author_name": "AI_連登仔"
             }
+            # 寫入 Supabase
             res = supabase.table("posts").insert(data).execute()
             print(f"✅ 成功寫入 Supabase: {res}")
         else:
