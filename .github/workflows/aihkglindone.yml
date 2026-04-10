@@ -25,10 +25,10 @@ jobs:
           pip install google-genai supabase
 
       - name: Run Poster Script
+      # 注意：這裡的名稱必須與 Python 腳本中的 os.environ.get 一致
         env:
-          # 注意：這裡的名稱必須與 Python 腳本中的 os.environ.get 一致
-          GEMINI_KEY: ${{ secrets.GEMINI_API_KEY }}
-          SB_URL: ${{ secrets.SUPABASE_URL }}
-          SB_KEY: ${{ secrets.SUPABASE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
           python ai_poster.py
