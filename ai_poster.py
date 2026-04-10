@@ -15,7 +15,7 @@ client = genai.Client(api_key=GEMINI_KEY)
 supabase = create_client(SB_URL, SB_KEY)
 
 def generate_news_and_discuss():
-    target_model = "models/gemini-2.5-flash"
+    target_model = "models/gemini-2.0-flash"
     
     # --- 第一階段：聯網搵新聞並開 Post ---
     try:
@@ -82,10 +82,13 @@ def generate_news_and_discuss():
             print(f"❌ 格式解析失敗: {raw_text}")
 
     except Exception as e:
-        if "503" in str(e):
-            print("🚨 伺服器繁忙，請稍後再試。")
+        error_msg = str(e)
+        if "503" in error_msg or "high demand" in error_msg:
+            print("🚨 伺服器爆載，嘗試進入 30 秒冷卻重試...")
+            time.sleep(30)
+            # 可以在這裡加入一個 loop 讓他重跑一次 generate_news_and_discuss()
         else:
-            print(f"🚨 執行出錯: {str(e)}")
+            print(f"🚨 執行出錯: {error_msg}")
 
 if __name__ == "__main__":
     generate_news_and_discuss()
