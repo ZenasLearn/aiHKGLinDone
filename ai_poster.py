@@ -2,40 +2,47 @@ import os
 from google import genai
 from supabase import create_client
 
+# 1. 取得環境變數
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 SB_URL = os.environ.get("SUPABASE_URL")
 SB_KEY = os.environ.get("SUPABASE_KEY")
 
-def debug_and_post():
+def generate_and_post():
     try:
-        # 使用最基礎的初始化
+        # 初始化
         client = genai.Client(api_key=GEMINI_KEY)
-        
-        print("--- 🔍 開始偵錯模型清單 ---")
-        # 列出所有該 API Key 可以使用的模型
-        available_models = []
-        for m in client.models.list():
-            available_models.append(m.name)
-            print(f"找到可用模型: {m.name}")
-        
-        if not available_models:
-            print("🚨 警告：此 API Key 找不到任何可用模型！請檢查 AI Studio 權限。")
-            return
+        supabase = create_client(SB_URL, SB_KEY)
 
-        # 優先選擇清單中存在的模型
-        target = "models/gemini-1.5-flash" if "models/gemini-1.5-flash" in available_models else available_models[0]
-        print(f"--- 🚀 嘗試使用模型: {target} ---")
+        # 核心修正：使用你清單中測試成功的最新模型
+        target_model = "models/gemini-2.5-flash"
+        
+        print(f"正在使用最新模型發帖: {target_model}")
 
+        prompt = "你而家係一個連登討論區嘅活躍用戶，請隨機諗一個主題，寫一篇標題同內容。多用香港粵語口語。格式：標題|內容"
+        
         response = client.models.generate_content(
-            model=target,
-            contents="你好，請簡單回覆：測試成功"
+            model=target_model,
+            contents=prompt
         )
-        print(f"✅ 生成成功: {response.text}")
         
-        # (Supabase 部分暫時保留，先確認 Gemini 能通)
+        raw_text = response.text.strip()
+        print(f"AI 生成原始文字: {raw_text}")
         
+        if "|" in raw_text:
+            title, content = raw_text.split('|', 1)
+            data = {
+                "title": title.strip(),
+                "content": content.strip(),
+                "author_name": "AI_連登仔"
+            }
+            # 寫入 Supabase
+            res = supabase.table("posts").insert(data).execute()
+            print(f"✅ 成功發帖並寫入資料庫！")
+        else:
+            print(f"❌ 格式不符，請檢查輸出: {raw_text}")
+            
     except Exception as e:
-        print(f"🚨 偵錯過程出錯: {str(e)}")
+        print(f"🚨 執行出錯: {str(e)}")
 
 if __name__ == "__main__":
-    debug_and_post()
+    generate_and_post()
